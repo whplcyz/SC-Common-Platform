@@ -1,6 +1,9 @@
 package com.whp.platform.sccommonplatform.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.oauth2.client.EnableOAuth2Sso;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.csrf.CsrfFilter;
@@ -21,14 +24,20 @@ import java.io.IOException;
 @Component
 @EnableOAuth2Sso
 public class SsoConfig extends WebSecurityConfigurerAdapter {
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
     @Override
     public void configure(HttpSecurity http) throws Exception {
-        http.antMatcher("/dashboard/**").authorizeRequests().anyRequest()
+        http.antMatcher("/**").authorizeRequests().anyRequest()
                 .authenticated().and().csrf()
                 .csrfTokenRepository(csrfTokenRepository()).and()
                 .addFilterAfter(csrfHeaderFilter(), CsrfFilter.class)
-                .logout().logoutUrl("/dashboard/logout").permitAll()
+                .logout().logoutUrl("/logout").permitAll()
                 .logoutSuccessUrl("/");
+
+        http.formLogin().loginPage("/login").permitAll().and().authorizeRequests()
+                .anyRequest().authenticated();
     }
 
     private Filter csrfHeaderFilter() {
@@ -54,5 +63,10 @@ public class SsoConfig extends WebSecurityConfigurerAdapter {
         HttpSessionCsrfTokenRepository repository = new HttpSessionCsrfTokenRepository();
         repository.setHeaderName("X-XSRF-TOKEN");
         return repository;
+    }
+
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.parentAuthenticationManager(authenticationManager);
     }
 }

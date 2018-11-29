@@ -1,5 +1,6 @@
 package com.whp.platform.sccommonplatform.config;
 
+import com.netflix.hystrix.HystrixCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,35 +25,9 @@ import java.security.KeyPair;
 @Configuration
 @SessionAttributes("authorizationRequest")
 public class AuthConfig implements WebMvcConfigurer {
-    @Override
-    public void addViewControllers(ViewControllerRegistry registry) {
-        registry.addViewController("/login").setViewName("login");
-        registry.addViewController("/oauth/confirm_access").setViewName("authorize");
-    }
-
-    @Configuration
-    //@Order(ManagementServerProperties.ACCESS_OVERRIDE_ORDER)
-    protected static class LoginConfig extends WebSecurityConfigurerAdapter {
-
-        @Autowired
-        private AuthenticationManager authenticationManager;
-
-        @Override
-        protected void configure(HttpSecurity http) throws Exception {
-            http.formLogin().loginPage("/login").permitAll().and().authorizeRequests()
-                    .anyRequest().authenticated();
-        }
-
-        @Override
-        protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-            auth.parentAuthenticationManager(authenticationManager);
-        }
-    }
-
     @Configuration
     @EnableAuthorizationServer
     protected static class OAuth2Config extends AuthorizationServerConfigurerAdapter {
-
         @Autowired
         private AuthenticationManager authenticationManager;
 
@@ -88,6 +63,5 @@ public class AuthConfig implements WebMvcConfigurer {
             oauthServer.tokenKeyAccess("permitAll()").checkTokenAccess(
                     "isAuthenticated()");
         }
-
     }
 }

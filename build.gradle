@@ -31,7 +31,8 @@ dependencies {
 	implementation('org.springframework.boot:spring-boot-starter-security')
 	implementation('org.springframework.boot:spring-boot-starter-web')
 	implementation('org.springframework.cloud:spring-cloud-starter-oauth2')
-	provided group: 'org.projectlombok', name: 'lombok', version: '1.18.4'
+	implementation('org.springframework.cloud:spring-cloud-starter-netflix-hystrix')
+	implementation("org.projectlombok:lombok:1.18.4")
 	testImplementation('org.springframework.boot:spring-boot-starter-test')
 	testImplementation('org.springframework.security:spring-security-test')
 }
